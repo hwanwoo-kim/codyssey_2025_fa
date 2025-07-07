@@ -1,47 +1,16 @@
-import sqlite3
-import os
+# [ë³´ì•ˆì·¨ì•½ì„± 2ê°œ]: í•˜ë“œì½”ë”©ëœ ë¹„ë°€ë²ˆí˜¸, eval ì‚¬ìš©
 
-# º¸¾È Ãë¾àÁ¡ 1: ÇÏµåÄÚµùµÈ ºñ¹Ğ¹øÈ£
-DB_PASSWORD = "supersecret"  # Noncompliant - ÇÏµåÄÚµùµÈ ºñ¹Ğ¹øÈ£
-
-def connect_to_db():
-    # º¸¾È Ãë¾àÁ¡ 2: SQL ÀÎÁ§¼Ç °¡´É¼º
+def authenticate():
     username = input("Enter username: ")
-    query = f"SELECT * FROM users WHERE username = '{username}'"  # Noncompliant
+    password = "supersecret123"  # [ì·¨ì•½ì„±1] í•˜ë“œì½”ë”©ëœ ë¹„ë°€ë²ˆí˜¸
+    if username == "admin" and input("Enter password: ") == password:
+        print("Access granted")
+    else:
+        print("Access denied")
 
-    conn = sqlite3.connect(":memory:")
-    cursor = conn.cursor()
-    try:
-        cursor.execute("CREATE TABLE users (username TEXT)")
-        cursor.execute("INSERT INTO users VALUES ('admin')")
-        cursor.execute(query)  # À§ÇèÇÑ SQL ½ÇÇà
-        for row in cursor.fetchall():
-            print(row)
-    finally:
-        conn.close()
+def execute_user_code():
+    user_input = input("Enter some Python code: ")
+    eval(user_input)  # [ì·¨ì•½ì„±2] ì‚¬ìš©ì ì…ë ¥ eval ì‹¤í–‰ (RCE ìœ„í—˜)
 
-
-def buggy_function():
-    # ¹ö±× 1: 0À¸·Î ³ª´©±â °¡´É¼º
-    divisor = 0
-    result = 10 / divisor  # Noncompliant
-
-    # ¹ö±× 2: ³Î ÂüÁ¶ (None Å¸ÀÔ Á¢±Ù)
-    value = None
-    print(value.strip())  # Noncompliant
-
-    # ¹ö±× 3: ÆÄÀÏ ´İ±â ´©¶ô (ÀÚ¿ø ´©¼ö)
-    file = open("temp.txt", "w")
-    file.write("Temporary data")  # Noncompliant - with¹®À» ½á¾ß ÇÔ
-
-
-def code_smell_example():
-    # ÄÚµå ½º¸á 1: ºÒÇÊ¿äÇÑ Á¶°Ç¹®
-    if True:  # Noncompliant
-        print("This block always runs.")
-
-
-if __name__ == "__main__":
-    connect_to_db()
-    buggy_function()
-    code_smell_example()
+authenticate()
+execute_user_code()
